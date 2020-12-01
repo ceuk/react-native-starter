@@ -1,5 +1,5 @@
 {
-  "main": "node_modules/expo/AppEntry.js",
+  "main": "./src/index.js",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
@@ -8,15 +8,44 @@
     "eject": "expo eject"
   },
   "dependencies": {
+    "@reduxjs/toolkit": "^1.5.0",
+    "@versita/fp-lib": "^1.0.16",
+    "axios": "^0.21.0",
     "expo": "~39.0.2",
+    "expo-secure-store": "^9.2.0",
     "expo-status-bar": "~1.0.2",
+    "ramda": "^0.27.1",
     "react": "16.13.1",
     "react-dom": "16.13.1",
     "react-native": "https://github.com/expo/react-native/archive/sdk-39.0.4.tar.gz",
-    "react-native-web": "~0.13.12"
+    "react-native-svg": "^12.1.0",
+    "react-native-web": "~0.13.12",
+    "react-redux": "^7.2.2",
+    "react-router-dom": "^5.2.0",
+    "react-router-native": "^5.2.0",
+    "redux-logger": "^3.0.6",
+    "redux-saga": "^1.1.3"
   },
   "devDependencies": {
-    "@babel/core": "~7.9.0"
+    "@babel/core": "^7.9.6",
+    "@testing-library/react-native": "^7.1.0",
+    "eslint": "^7.14.0",
+    "eslint-plugin-immutable": "^1.0.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-no-loops": "^0.3.0",
+    "eslint-plugin-no-secrets": "^0.6.8",
+    "eslint-plugin-no-unsanitized": "^3.1.4",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-ramda": "^2.5.1",
+    "eslint-plugin-react": "^7.21.5",
+    "eslint-plugin-react-native": "^3.10.0",
+    "eslint-plugin-react-native-a11y": "^2.0.3",
+    "eslint-plugin-react-redux": "^3.3.0",
+    "eslint-plugin-sonarjs": "^0.5.0",
+    "eslint-plugin-sort-keys-fix": "^1.1.1",
+    "eslint-plugin-standard": "^5.0.0",
+    "eslint-plugin-unicorn": "^23.0.0",
+    "eslint-plugin-xss": "^0.1.10"
   },
   "private": true
 }
