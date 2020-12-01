@@ -60,13 +60,8 @@ ButtonComponent.propTypes = {
   disabled: PropTypes.bool,
   success: PropTypes.bool,
   error: PropTypes.bool,
-  /** The size of the button */
   size: PropTypes.oneOf(['small', 'large']),
-  /** Whether to use the secondary style */
   secondary: PropTypes.bool,
-  /** Whether to use the outline style */
-  outline: PropTypes.bool,
-  /** Whether to mask the button with a loading indicator */
   loading: PropTypes.bool
 }
 
