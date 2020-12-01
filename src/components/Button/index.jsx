@@ -41,6 +41,7 @@ const ButtonComponent = ({
   return (
     <TouchableOpacity
       {...otherProps}
+      accessibilityRole="button"
       disabled={loading || disabled}
       style={StyleSheet.compose([rootStyles, style])}
     >
