@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "^1.5.0",
-    "@versita/fp-lib": "^1.0.16",
+    "@versita/fp-lib": "^1.0.20",
     "axios": "^0.21.0",
     "expo": "~39.0.2",
     "expo-secure-store": "^9.2.0",
@@ -32,12 +32,17 @@
     "react-router-dom": "^5.2.0",
     "react-router-native": "^5.2.0",
     "redux-logger": "^3.0.6",
-    "redux-saga": "^1.1.3"
+    "redux-observable": "^1.2.0",
+    "rxjs": "^6.6.3"
   },
   "devDependencies": {
     "@babel/core": "^7.9.6",
     "@babel/preset-env": "^7.12.7",
     "@testing-library/react-native": "^7.1.0",
+    "@types/jest": "^26.0.16",
+    "@types/react": "^17.0.0",
+    "@types/react-native": "^0.63.37",
+    "@types/react-test-renderer": "^17.0.0",
     "babel-jest": "^26.6.3",
     "cypress": "^6.0.1",
     "cypress-terminal-report": "^2.4.0",
@@ -60,7 +65,8 @@
     "eslint-plugin-xss": "^0.1.10",
     "jest": "^26.6.3",
     "jest-expo": "^39.0.0",
-    "riteway-jest": "^2.0.2"
+    "riteway-jest": "^2.0.2",
+    "typescript": "^4.1.2"
   },
   "jest": {
     "preset": "jest-expo",

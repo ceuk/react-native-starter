@@ -1,7 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { call, put, takeLatest } from 'redux-saga/effects'
 import { loginRequest, validateTokenRequest } from '../api/methods/auth'
-import { Either, setItem, removeItem } from '@versita/fp-lib'
+import { map, mergeMap } from 'rxjs/operators'
+import { Either } from '@versita/fp-lib'
+import { setItem, removeItem } from '../localStorage'
+import { ofType, combineEpics } from 'redux-observable'
 
 const initialAuthState = {
   currentUser: undefined,
@@ -37,48 +39,57 @@ const { actions, reducer } = createSlice({
     LOGOUT_SUCCESS: (state) => {
       state.currentUser = undefined
       state.loggingIn = false
-    }
-
+    },
+    LOGOUT_ATTEMPT: () => {},
+    SESSION_SAVED: () => {},
+    SESSION_VALIDATED: () => {}
   }
 })
 
-// Sagas
+const onLoginAttempt = action$ => action$.pipe(
+  ofType(actions.LOGIN_ATTEMPT),
+  mergeMap(({ payload }) =>
+    loginRequest(payload)
+      .pipe(map(Either.fold(
+        ({ error }) => actions.LOGIN_FAILED(String(error)),
+        ({ value }) => actions.LOGIN_SUCCESS(value)
+      )))
+  )
+)
 
-function * onLoginAttempt ({ payload }) {
-  const res = yield call(loginRequest, payload)
-  yield put(Either.fold(
-    ({ error }) => actions.LOGIN_FAILED(String(error)),
-    ({ value }) => actions.LOGIN_SUCCESS(value),
-    res
-  ))
-}
+const onLoginSuccess = action$ => action$.pipe(
+  ofType(actions.LOGIN_SUCCESS),
+  map(({ payload }) => {
+    setItem('currentUser', payload)
+    return actions.SESSION_SAVED
+  })
+)
 
-function * onLoginSuccess ({ payload }) {
-  yield call(setItem, 'currentUser', payload.value)
-}
+const onLoginRestored = action$ => action$.pipe(
+  ofType(actions.LOGIN_RESTORED),
+  mergeMap(() =>
+    validateTokenRequest()
+      .pipe(map(Either.fold(
+        actions.LOGOUT_ATTEMPT,
+        actions.SESSION_VALIDATED
+      )))
+  )
+)
 
-function * onLoginFailed () {
-  // show a message saying login failed
-}
+const onLogoutAttempt = action$ => action$.pipe(
+  ofType(actions.LOGOUT_ATTEMPT),
+  map(({ payload }) => {
+    removeItem('currentUser', payload.value)
+    return actions.LOGOUT_SUCCESS
+  })
+)
 
-function * onLoginRestored () {
-  const res = yield call(validateTokenRequest)
-  if (res.isLeft) {
-    yield put(actions.LOGOUT_SUCCESS())
-  }
-}
-
-function * onLogout () {
-  yield call(removeItem, 'currentUser')
-}
-
-export function * saga () {
-  yield takeLatest(actions.LOGIN_ATTEMPT, onLoginAttempt)
-  yield takeLatest(actions.LOGIN_SUCCESS, onLoginSuccess)
-  yield takeLatest(actions.LOGIN_RESTORED, onLoginRestored)
-  yield takeLatest(actions.LOGOUT_SUCCESS, onLogout)
-  yield takeLatest(actions.LOGIN_FAILED, onLoginFailed)
-}
+export const epics = combineEpics(
+  onLoginAttempt,
+  onLoginSuccess,
+  onLoginRestored,
+  onLogoutAttempt
+)
 
 export const {
   LOGIN_ATTEMPT,

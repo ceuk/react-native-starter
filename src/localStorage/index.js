@@ -1,58 +1,54 @@
 /* global localStorage */
 import * as SecureStore from 'expo-secure-store'
-import { Either, pipe, curry, partial } from '@versita/fp-lib'
+import { pipe, curry, Task, map } from '@versita/fp-lib'
+import { promiseFromTryCatch } from '../utils'
+import { Platform } from 'react-native'
 
-const storageEngine = SecureStore.isAvailableAsync() ? SecureStore : localStorage
-
-/**
- * Pure version of localStorage.getItem that won't throw
- *
- * @param key localStorage property to retrieve
- * @returns Either error deserialized value
- */
-export const getItem = (key) => {
-  return Either.tryCatch(
-    () => pipe(
-      storageEngine.getItem.bind(storageEngine),
-      String,
-      JSON.parse.bind(JSON)
-    )(key),
-    (reason) => new Error(String(reason))
-  )
+const secureStoreAvailable = SecureStore.isAvailableAsync()
+const storageEngine = {
+  getItem: secureStoreAvailable && Platform.native ? SecureStore.getItemAsync : promiseFromTryCatch(localStorage.getItem.bind(localStorage)),
+  setItem: secureStoreAvailable && Platform.native ? SecureStore.setItemAsync : promiseFromTryCatch(localStorage.setItem.bind(localStorage)),
+  removeItem: secureStoreAvailable && Platform.native ? SecureStore.deleteItemAsync : promiseFromTryCatch(localStorage.removeItem.bind(localStorage))
 }
 
 /**
- * Curried, pure version of localStorage.setItem that won't throw
+ * Get stored value by key
+ *
+ * @param key property to retrieve
+ * @returns Task(value)
+ */
+export const getItem = pipe(
+  storageEngine.getItem,
+  Task.fromPromise,
+  map(String),
+  map(JSON.parse)
+)
+
+/**
+ * Set storage value by key
  *
  * @Remarks curried
- * @param key localStorage property to set
- * @param value value to serialize and write to localStorage
- * @returns Either error or null
+ * @param key property to set
+ * @param value value to serialize and write to storage
+ * @returns Task(value)
  */
-export const setItem = curry((key, value) => {
-  return Either.tryCatch(
-    () => {
-      const writeToLS = partial(storageEngine.setItem.bind(storageEngine), [key])
-      pipe(
-        JSON.stringify.bind(JSON),
-        writeToLS
-      )(value)
-    },
-    (reason) => new Error(String(reason))
-  )
-})
+export const setItem = curry((key, value) =>
+  pipe(
+    JSON.stringify,
+    storageEngine.setItem(key),
+    Task.fromPromise
+  )(value)
+)
 
 /**
- * Delete locally-stored item by key
+ * Delete storage value by key
  *
  * @param key storage property to remove
- * @returns Either error or void
+ * @returns Task(null)
  */
-export const removeItem = (key) => {
-  return Either.tryCatch(
-    () => storageEngine.removeItem.bind(storageEngine)(key),
-    (reason) => new Error(String(reason))
-  )
-}
+export const removeItem = pipe(
+  storageEngine.removeItem,
+  Task.fromPromise
+)
 
 export default storageEngine

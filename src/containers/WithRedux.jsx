@@ -1,33 +1,27 @@
 import { configureStore, getDefaultMiddleware } from '@reduxjs/toolkit'
 import React from 'react'
 import { Provider } from 'react-redux'
+import { createEpicMiddleware, combineEpics } from 'redux-observable'
 import logger from 'redux-logger'
-import createSagaMiddleware from 'redux-saga'
-import { all } from 'redux-saga/effects'
 import PropTypes from 'prop-types'
 
-import authReducer, { saga as authSaga } from '../ducks/auth'
-
-const sagas = [
-  authSaga()
-]
+import authReducer, { epics as authEpic } from '../ducks/auth'
 
 const reducers = {
   auth: authReducer
 }
 
-const sagaMiddleware = createSagaMiddleware()
+const rootEpic = combineEpics(
+  authEpic
+)
 
-// build saga middleware
-function * rootSaga () {
-  yield all(sagas)
-}
+const epicMiddleware = createEpicMiddleware()
 
 const buildMiddleware = (includeLogger) => {
   // apply default middleware
   const middleware = [
     ...getDefaultMiddleware(),
-    sagaMiddleware
+    epicMiddleware
   ]
   // include logger if enabled
   return includeLogger
@@ -40,7 +34,7 @@ export const store = configureStore({
   middleware: buildMiddleware(process.env.NODE_ENV !== 'production')
 })
 
-sagaMiddleware.run(rootSaga)
+epicMiddleware.run(rootEpic)
 
 const ReduxStore = ({ children }) => (
   <Provider store={store}>
