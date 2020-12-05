@@ -54,9 +54,11 @@
     "assert": "readonly"
   },
   "rules": {
+    "unicorn/no-null": 0,
     "sonarjs/no-identical-functions": 0,
     "react-native/no-single-element-style-arrays": 0,
     "unicorn/filename-case": 0,
+    "unicorn/no-fn-reference-in-iterator": 0,
     "unicorn/prevent-abbreviations": 0,
     "xss/no-mixed-html": 2,
     "xss/no-location-href-assign": 2,
